@@ -3,3 +3,4 @@ create table todos (
     name text,
     completed boolean
 );
+
