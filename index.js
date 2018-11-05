@@ -1,19 +1,8 @@
-// const pgPromise = require('pg-promise')();
-// const pgp = pgPromise();
-const pgp = require('pg-promise')();
-const db = pgp({
-    host: 'localhost',
-    port: 5432,
-    database: 'node-todo-app-db'
-});
-// CREATE
-function addRow(name, completed) {
-    return db.one(`insert into todos (name,completed)
-        values
-        ($1, $2)
-        returning id 
-    `, [name, completed])
-}
+const Todo = require('./models/Todo')
+
+
+
+
 
 // addRow('walk the cat ', false)
 //     .catch(err => {
@@ -47,35 +36,70 @@ function addRow(name, completed) {
 //         })
 // }
 
-// getByID(3)
-//     .then(results => {
-//         console.log(results);
-//     })
+Todo.getByID(3)
+.then(results => {
+console.log(results);
+});
 
-// getByID(20000)
-//     .then(results => {
-//         console.log(results);
-//     })
+Todo.getByID(20000)
+.then(results => {
+console.log(results);
+})
 
 
 
 
 
 // example of updating a row
-
-
-
-
-
-
-
-// Delete
-
-// function deleteByID(id) {
-//     return db.any(`delete from todos where id = $1`,[id])
+// function updatedCompleted(id, didComplete) {
+//     return db.result(`update todos
+//                         set completed=true           
+//                         where id=$1`, [id, didComplete]);
 // }
 
-// deleteByID(10)
-//     .then(result =>{
-//         console.log(result.rowCount);
-//     })
+
+// function markCompleted(id) {
+//     return updatedCompleted(id,true);
+    
+// }
+
+
+
+// function markPending(id) {
+// //     // return updatedCompleted(id, false);
+// return db.result(`update todos
+//                         set completed=true           
+//                         where id=$1`, [id, false]);
+// }
+
+// markPending(1)
+// .then(result => {
+//     console.log(result); })
+    
+
+
+
+
+// function updateName(id, name) {
+//     return db.result(`update todos
+//                     set name=$2
+//                     where id=$1`, [id, name])
+// }
+// updateName(2, 'buy car')
+// .then(result =>{
+//     console.log(result);
+// })
+// // Delete
+
+// // function deleteByID(id) {
+// // return db.result(`delete from todos where id = $1`,[id])
+// // }
+
+// // deleteByID()
+// // .then(result =>{
+// // console.log(result.rowCount);
+// // })
+
+
+
+
