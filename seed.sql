@@ -5,3 +5,12 @@ values
 ('Shower', false),
 ('Walk Dog', false),
 ('Workout', false);
+
+insert into users 
+    (name)
+values
+    ('Billy'),
+    ('Willy'),
+    ('Philly'),
+    ('Ricky'),
+    ('Harris');
