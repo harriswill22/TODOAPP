@@ -1,5 +1,20 @@
+require('dotenv').config();
 const Todo = require('./models/Todo')
+const User = require('./models/User')
 
+
+
+
+// User.updateName(2, 'shelly')
+// .then(updatedName => {
+//     console.log(updatedName);
+// })
+
+
+User.getById(2)
+    .then(userFromDB => {
+        console.log(userFromDB);
+    });
 
 
 
@@ -19,11 +34,11 @@ const Todo = require('./models/Todo')
 // function getAll() {
 //     return db.any('select * from todos')
 // }
-// getAll()
-//     .then(results => {
-//         console.log(results);
-//         console.log('All the todos');
-//     })
+// User.getAll()
+// .then(results => {
+// console.log(results);
+// console.log('All the Users');
+// })
 
 
 // example of grabbing one row
@@ -36,15 +51,25 @@ const Todo = require('./models/Todo')
 //         })
 // }
 
-Todo.getByID(3)
-.then(results => {
-console.log(results);
-});
+// Todo.getByID(1)
+// .then(results => {
+// console.log(results);
+// });
 
-Todo.getByID(20000)
-.then(results => {
-console.log(results);
-})
+// const Will = new User('Will Harris');
+// const Danny = new User('Danny Willis');
+
+// Will.greet(Danny);
+// Danny.greet(Will)
+
+// let u = User.findById(1);
+// u.name = 'Will';
+// u.save();
+
+// Todo.getByID(20000)
+// .then(results => {
+// console.log(results);
+// })
 
 
 
@@ -60,7 +85,7 @@ console.log(results);
 
 // function markCompleted(id) {
 //     return updatedCompleted(id,true);
-    
+
 // }
 
 
@@ -75,7 +100,7 @@ console.log(results);
 // markPending(1)
 // .then(result => {
 //     console.log(result); })
-    
+
 
 
 
@@ -99,7 +124,3 @@ console.log(results);
 // // .then(result =>{
 // // console.log(result.rowCount);
 // // })
-
-
-
-
