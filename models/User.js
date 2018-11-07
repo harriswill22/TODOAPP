@@ -78,10 +78,10 @@ getTodos() {
 
 // =============================================
 // UPDATE
-static updateName(id, name) {
+updateName(name){
     return db.result(`update users
                     set name=$2
-                    where id=$1`, [id, name]);
+                    where id=$1`, [this.id, name]);
 }
 
 
