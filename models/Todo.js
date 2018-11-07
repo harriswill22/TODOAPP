@@ -1,84 +1,97 @@
 const db = require('./db');
+class Todo {
+
+constructor(id, name, completed) {
+this.id = id;
+this.name = name;
+this.completed = completed;
+}
 
 // CREATE
-function addRow(name, completed) {
+static addRow(name, completed) {
     return db.one(`insert into todos (name,completed)
         values
         ($1, $2)
         returning id 
     `, [name, completed])
+    .then(data =>{
+        const newTodo = new Todo(name, completed );
+        return newTodo;
+    });
 }
 
 // Retrieve 
-function getAll() {
-        return db.any('select * from todos')
-    }
-    getAll()
-        .then(results => {
-            console.log(results);
-        console.log('All the todos');
-    })
-
-    function getByID(id) {
-        return db.one(`select * from todos where id = $1`,[id])
-        .catch(err => {
-        return {
-        name: 'No Todo Found.'
-        };
+static getAll() {
+        return db.any(`
+        select * from todos`
+        ).then(todoArry =>{
+            const instanceArray = todoArry.map(todoObj =>{
+                const allTodos = new Todo(todoObj.name, todoObj.completed);
+                return allTodos;
+            });
+            return instanceArray;
         })
     }
+    
 
-function getTodosForUser(id) {
-    return db.any( `select * from todos where user_id = $1`,[id]);
+    static getByID(id) {
+        return db.one(`select * from todos where id = $1`,[id])
+        .then(result => {
+            const todoID = new Todo(result.id, result.name);
+            return todoID;
+        })
+        }
+    
+
+static getTodosForUser(name) {
+    return db.any( `select * from todos where user_id = $1`,[name])
 }
-
-
 
 
 // UPDATE
 
-function assignToUser(todoID, userID) {
-    db.result (`update todos
+assignToUser(userID) {
+return db.result (`update todos
     set user_id = $1
-    where id = $2`, [todoID,userID]);
+    where id = $2`, [this.id,userID])  
 }
 
 
-
-
-function updatedCompleted(id, didComplete) {
+updatedCompleted(didComplete){
     return db.result(`update todos
-                        set completed=true           
-                        where id=$1`, [id, didComplete]);
+                        set completed=$2           
+                        where id=$1`, [this.id, didComplete]);
 }
 
-function markCompleted(id) {
-    return updatedCompleted(id,true);
+markCompleted() {
+    return this.updatedCompleted(true);
 }
 
-function markPending(id) {
-    //     // return updatedCompleted(id, false);
-    return db.result(`update todos
-                            set completed=true           
-                            where id=$1`, [id, false]);
-    }
+markPending() {
+    return this.updatedCompleted(false);
+}
 
-function updateName(id, name) {
+updateName(name){
         return db.result(`update todos
                         set name=$2
-                        where id=$1`, [id, name])
+                        where id=$1`, [this.id, name])
 }
 
-function deleteByID(id) {
-return db.result(`delete from todos where id = $1`,[id])
+deleteByID() {
+return db.result(`delete from todos where id = $1`,[this.id])
 }
 
-module.exports = {
-    addRow,
-    deleteByID,
-    getAll,
-    getByID,
-    markCompleted,
-    markPending,
-    updateName,
+static deleteByID(id) {
+    return db.result(`delete from todos where id = $1`,[id])
 }
+
+}
+module.exports = Todo;
+    // addRow,
+    // deleteByID,
+    // getAll,
+    // getByID,
+    // markCompleted,
+    // markPending,
+    // updateName,
+
