@@ -1,6 +1,37 @@
 require('dotenv').config();
-const Todo = require('./models/Todo')
+const express = require('express');
+const app = express();
+// const Todo = require('./models/Todo')
+
 const User = require('./models/User')
+
+//  Listen for a get request
+app.get('/', (req, res) => {
+    User.getAll()
+    .then(allUsers =>{
+        console.log(allUsers);
+        res.send(allUsers);
+        // res.status(200).json(allUsers);
+    })
+
+
+
+    // res.send('Hello there Will');
+});
+
+app.listen(3000, () => {
+    console.log('You are ready!');
+    
+});
+
+
+
+
+
+
+
+
+
 
 // ========================================================
 
