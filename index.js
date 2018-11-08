@@ -1,41 +1,120 @@
 require('dotenv').config();
+
 const express = require('express');
 const app = express();
-// const Todo = require('./models/Todo')
+const bodyParser = require('body-parser');
 
-const User = require('./models/User')
-// ===========================================
-//  Listen for a get request
-app.get('/', (req, res) => {
+// Configure body-parser to read data sent by HTML form tags
+app.use(bodyParser.urlencoded({extended: false}));
+
+// configure body-parser to read JSON bodies
+app.use(bodyParser.json());
+
+
+const Todo = require('./models/Todo');
+const User = require('./models/User');
+
+// Listen for a GET request
+app.get('/users', (req, res) => {
     User.getAll()
-    .then(allUsers =>{
-        console.log(allUsers);
-        res.send(allUsers);
-        // res.status(200).json(allUsers);
-    })
+        .then(allUsers => {
+            // res.status(200).json(allUsers);
+            res.send(allUsers);
+        })
+});
 
-app.get('/users/:id([0-9]+)', (req, res) => {
+
+// Match the string "/users/" followed by one or more digits
+// REGular EXpressions
+// app.get('/users/:id([0-9]+)', (req, res) => {
+app.get(`/users/:id(\\d+)`, (req, res) => {
     // console.log(req.params.id);
     User.getById(req.params.id)
-    .then(theUser => {
-        res.send(theUser);
+        .catch(err => {
+            res.send({
+                message: `no soup for you`
+            });
+        })
+        .then(theUser => {
+            res.send(theUser);
+        })
+});
+
+
+app.get('/users/register', (req, res) => {
+    res.send('you are on the registration page. no really.');
+});
+
+
+// ========== TODOS
+
+app.get('/todos', (req, res) => {
+Todo.getAll()
+    .then(allTodos =>{
+        res.send(allTodos);
     })
+});
+
+app.get(`/todos/:id(\\d+)`, (req, res ) => {
+    Todo.getByID(req.params.id)
     .catch(err => {
         res.send({
-            message: `no user`
+            message: `no todo big fella`
         });
     })
+    .then(theTodo => {
+        res.send(theTodo);
+        })
+});
 
+app.get(`/todos/user/:id(\\d+)/pending`, (req, res) =>{
+    User.getById(req.params.id)
+    .then(usertodo => {
+        usertodo.getTodos()
+        .then(result => {
+            res.send(result)
+        })
+    })
+})
+
+// POST ===============================================
+
+app.post('/users', (req, res) => {
+    // console.log(req.body);
+    // res.send('ok')
+    const newUsername = req.body.name;
+    User.addRow(newUsername)
+    .then(theUser =>{
+        res.send(theUser);
+    })
 });
 
 
-    // res.send('Hello there Will');
+app.post('/users/:id(\\d+)', (req, res) => {
+    const id = req.params.id;
+    const newName = req.body.name;
+    User.getById(id)
+        .then(theUser => {
+            theUser.updateName(newName)
+                .then(result => {
+                    if (result.rowCount ===1 ){
+                        res.send('yes')
+                    }else {
+                        res.send('oops')
+                    }
+
+                })
+        })
 });
+
+
+
+
+
 
 app.listen(3000, () => {
-    console.log('You are ready!');
-    
-});
+    console.log('You express app is ready!');
+})
 
 
 
@@ -85,18 +164,19 @@ app.listen(3000, () => {
 // })
 
 
-// Todo.getByID(1)
+// Todo.getByID(2)
 // .then(todo =>{
-//     todo.updateName('sell the car')
+//     todo.updateName('Talk on the phone')
 // .then(result =>{
 //     console.log(result);
 // })
 // })
 
 
-// Todo.getByID(1)
+// ASSIGN
+// Todo.getByID(2)
 // .then(usertodo => {
-//     usertodo.assignToUser(1)
+//     usertodo.assignToUser(3)
 //     .then(result => {
 //         console.log(result);
 //         })
@@ -111,7 +191,7 @@ app.listen(3000, () => {
 // })
 
 
-// Todo.getByID(1)
+// Todo.getByID()
 //     .then(todo =>{
 //         todo.markPending()
 //             .then(result => {
