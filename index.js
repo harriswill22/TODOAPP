@@ -4,7 +4,7 @@ const app = express();
 // const Todo = require('./models/Todo')
 
 const User = require('./models/User')
-
+// ===========================================
 //  Listen for a get request
 app.get('/', (req, res) => {
     User.getAll()
@@ -14,6 +14,19 @@ app.get('/', (req, res) => {
         // res.status(200).json(allUsers);
     })
 
+app.get('/users/:id([0-9]+)', (req, res) => {
+    // console.log(req.params.id);
+    User.getById(req.params.id)
+    .then(theUser => {
+        res.send(theUser);
+    })
+    .catch(err => {
+        res.send({
+            message: `no user`
+        });
+    })
+
+});
 
 
     // res.send('Hello there Will');
