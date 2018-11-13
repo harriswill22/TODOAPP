@@ -1,4 +1,9 @@
-function page(content) {
+const { header, footer , logOutButton, loginOrRegister} = require('./helper')
+
+
+function page(content, isLoggedIn=false) {
+    
+    
     return `
     <!DOCTYPE html>
 <html lang="en">
@@ -12,13 +17,15 @@ function page(content) {
 </head>
 </head>
 <body>
-    ${content}
+${header()}
+${
+    isLoggedIn ? logOutButton() : loginOrRegister()
+}
+${content}
+${footer()}
 </body>
 </html>
     `;
 }
-
-
-
 
 module.exports = page;
