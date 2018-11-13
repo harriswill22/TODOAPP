@@ -11,18 +11,18 @@ class User {
     // 'constructor is a method 
     // that is automatically called when you creat a user
     constructor(id, name, username, pwhash) {
-    //define properties that 
-    // are also the names of the database columns 
-    this.id = id;
-    this.name = name;
-    this.username = username;
-    this.pwhash = pwhash;
+        //define properties that 
+        // are also the names of the database columns 
+        this.id = id;
+        this.name = name;
+        this.username = username;
+        this.pwhash = pwhash;
 
     }
-//     greet(otherUser) {
-//     console.log(`Hello ${otherUser.name}, I am ${this.name} `);
-//     }
-// }
+    //     greet(otherUser) {
+    //     console.log(`Hello ${otherUser.name}, I am ${this.name} `);
+    //     }
+    // }
 
 
 
@@ -30,106 +30,119 @@ class User {
 
 
 
-// =============================================
-// CREATE
-static addRow(name, username, password) {
-    const salt = bcrypt.genSaltSync(saltRounds);
-    const hash = bcrypt.hashSync(password, salt);
-    return db.one(
-        `insert into users (name, username, pwhash)
+    // =============================================
+    // CREATE
+    static addRow(name, username, password) {
+        const salt = bcrypt.genSaltSync(saltRounds);
+        const hash = bcrypt.hashSync(password, salt);
+        return db.one(
+                `insert into users (name, username, pwhash)
         values
         ($1, $2,$3)
         returning id 
     `, [name, username, hash])
-    .then(data => {
-        const u = new User(data.id, name, username);
-        return u;
-    });
-}
-// =============================================
-// RETRIEVE
-static getAll() {
-    return db.any('select * from users')
-    .then(userArray => {
-const instanceArray = userArray.map(userObj => {
-    const u = new User(userObj.id, userObj.name);
-    return u;
+            .then(data => {
+                const u = new User(data.id, name, username);
+                return u;
+            });
+    }
 
-});
-    return instanceArray;
-    })
-}
 
-static getById(id) {
-    return db.one(`select * from users 
+    static from(userObj) {
+        const id = userObj.id;
+        const username = userObj.iusernamed
+        const name = userObj.named
+        const pwhash = userObj.pwhash
+        return new User(id, username, name, pwhash);
+    }
+
+
+
+
+    // =============================================
+    // RETRIEVE
+    static getAll() {
+        return db.any('select * from users')
+            .then(userArray => {
+                const instanceArray = userArray.map(userObj => {
+                    const u = new User(userObj.id, userObj.name);
+                    return u;
+
+                });
+                return instanceArray;
+            })
+    }
+
+    static getById(id) {
+        return db.one(`select * from users 
     where id = $1`, [id])
-    .then(result => {
-        const u = new User(result.id, result.name);
-        return u;
-    })
-}
+            .then(result => {
+                const u = new User(result.id, result.name);
+                return u;
+            })
+    }
 
-static searchByName(name) {
-    return db.any(`
+    static searchByName(name) {
+        return db.any(`
     select * from users where ilike '%1:raw%
     `, [name])
-}
+    }
 
-static getByUsername(username) {
-    return db.one(`
+    static getByUsername(username) {
+        return db.one(`
     select * from users 
     where username ilike 
     '%$1:raw%'
-    `,[username]). then(result => {
-        return new User(result.id,
-            result.name,
-            result.username,
-            result.pwhash);
-    })
-}
+    `, [username]).then(result => {
+            return new User(result.id,
+                result.name,
+                result.username,
+                result.pwhash);
+        })
+    }
 
 
 
 
-getTodos() {
-    return db.any (`
+    getTodos() {
+        return db.any(`
     select * from todos 
     where user_id = $1`,
-    [this.id]);
-}
+            [this.id]);
+    }
 
 
 
 
 
-passwordDoesMatch(thePassword) {
-    const didMatch = bcrypt.compareSync(thePassword, this.pwhash);
-    return didMatch;
-}
+    passwordDoesMatch(thePassword) {
+        const didMatch = bcrypt.compareSync(thePassword, this.pwhash);
+        return didMatch;
+    }
 
-// =============================================
-// UPDATE
-updateName(name){
-    return db.result(`update users
+    // =============================================
+    // UPDATE
+    updateName(name) {
+        return db.result(`update users
     set name=$2
     where id=$1`, [this.id, name]);
-}
+    }
 
 
-// =============================================
-// DELETE
-static deleteById(id) { 
-    return db.result(`
+    // =============================================
+    // DELETE
+    static deleteById(id) {
+        return db.result(`
     delete from users
-    where id = $1`, 
-    [id]);
-}
-delete() {
-    return db.result(`
+    where id = $1`,
+            [id]);
+    }
+    delete() {
+        return db.result(`
     delete from users
-    where id = $1`, 
-    [this.id]);
-}
+    where id = $1`,
+            [this.id]);
+    }
 
 
 
@@ -141,9 +154,9 @@ delete() {
 
 }
 module.exports = User;
-    // addRow,
-    // deleteById,
-    // getAll,
-    // getByID,
-    // updateName,
-    // User
+// addRow,
+// deleteById,
+// getAll,
+// getByID,
+// updateName,
+// User
