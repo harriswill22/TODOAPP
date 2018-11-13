@@ -1,5 +1,8 @@
 // DATABASE CONNECTION
 const db = require('./db');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
 
 // Declare a class
 class User {
@@ -7,11 +10,14 @@ class User {
     // what properties should a user start off with
     // 'constructor is a method 
     // that is automatically called when you creat a user
-    constructor(id, name) {
+    constructor(id, name, username, pwhash) {
     //define properties that 
     // are also the names of the database columns 
     this.id = id;
     this.name = name;
+    this.username = username;
+    this.pwhash = pwhash;
+
     }
 //     greet(otherUser) {
 //     console.log(`Hello ${otherUser.name}, I am ${this.name} `);
@@ -26,15 +32,17 @@ class User {
 
 // =============================================
 // CREATE
-static addRow(name) {
+static addRow(name, username, password) {
+    const salt = bcrypt.genSaltSync(saltRounds);
+    const hash = bcrypt.hashSync(password, salt);
     return db.one(
-        `insert into users (name)
+        `insert into users (name, username, pwhash)
         values
-        ($1)
+        ($1, $2,$3)
         returning id 
-    `, [name])
+    `, [name, username, hash])
     .then(data => {
-        const u = new User(data.id, name );
+        const u = new User(data.id, name, username);
         return u;
     });
 }
@@ -67,6 +75,21 @@ static searchByName(name) {
     `, [name])
 }
 
+static getByUsername(username) {
+    return db.one(`
+    select * from users 
+    where username ilike 
+    '%$1:raw%'
+    `,[username]). then(result => {
+        return new User(result.id,
+            result.name,
+            result.username,
+            result.pwhash);
+    })
+}
+
+
+
 
 getTodos() {
     return db.any (`
@@ -76,12 +99,20 @@ getTodos() {
 }
 
 
+
+
+
+passwordDoesMatch(thePassword) {
+    const didMatch = bcrypt.compareSync(thePassword, this.pwhash);
+    return didMatch;
+}
+
 // =============================================
 // UPDATE
 updateName(name){
     return db.result(`update users
-                    set name=$2
-                    where id=$1`, [this.id, name]);
+    set name=$2
+    where id=$1`, [this.id, name]);
 }
 
 
@@ -99,6 +130,14 @@ delete() {
     where id = $1`, 
     [this.id]);
 }
+
+
+
+
+
+
+
+
 
 }
 module.exports = User;
